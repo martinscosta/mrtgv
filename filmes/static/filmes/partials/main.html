@@ -1,0 +1,160 @@
+﻿<style>
+    h2.titulo {
+        margin-top:0px;
+        font-size: 20px;
+    }
+    .filme { 
+        margin-top:10px;
+    }
+    span.rating {
+        font-size: 20px;
+        margin-right:10px;
+    }
+</style>
+<div class="container">
+    <h1>Filmoteca</h1>
+
+    <div>
+	    <button class="btn btn-xs btn-default" ng-click="filtrosIsCollapsed = !filtrosIsCollapsed">Filtros</button>
+	    <hr>
+	    <div collapse="filtrosIsCollapsed">
+
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-md-1 control-label" for="ano" >Ano:</label>
+                    <div class="col-md-2">
+                        <input type="text" class="form-control" name="ano" ng-model="filtros.Year_s" placeholder="Ano">
+                    </div>
+
+                    <label class="col-md-offset-2 col-md-1 control-label">Gênero:</label>
+                    <div class="col-md-4">
+                    <ui-select multiple ng-model="filtros.Genre_ss"  style="width: 300px;">
+                        <ui-select-match placeholder="Selecione os gêneros...">{{$item}}</ui-select-match>
+                        <ui-select-choices repeat="genero in availableGenres | filter:$select.search">
+                          {{genero}}
+                        </ui-select-choices>
+                      </ui-select>
+                    </div>
+		                       
+		    <label class="col-md-1 control-label">Nr. Docs:</label>
+                    <div class="col-md-1">
+                        <input type="text" class="form-control" name="rows" ng-model="params.rows" placeholder="Nr Docs">
+                    </div>			
+
+ 
+
+                </div>
+
+                <div class="form-group">
+                   <label class="col-md-1 control-label">País(es):</label>
+                    <div class="col-md-4">
+                    <ui-select multiple ng-model="filtros.Country_ss"  style="width: 300px;">
+                        <ui-select-match placeholder="Selecione o país...">{{$item}}</ui-select-match>
+                        <ui-select-choices repeat="pais in availableCountries | filter:$select.search">
+                          {{pais}}
+                        </ui-select-choices>
+                      </ui-select>
+                    </div>
+
+                   <label class="col-md-1 control-label">Língua:</label>
+                    <div class="col-md-4">
+                    <ui-select multiple ng-model="filtros.Language_ss"  style="width: 300px;">
+                        <ui-select-match placeholder="Selecione  língua...">{{$item}}</ui-select-match>
+                        <ui-select-choices repeat="lingua in availableLanguages | filter:$select.search">
+                          {{lingua}}
+                        </ui-select-choices>
+                      </ui-select>
+                    </div>
+
+                </div>
+
+            </form>
+
+            <button class="btn btn-xs btn-info" ng-click="pesquisar()">Pesquisar</button>
+    	    <hr>
+	    </div>
+
+    </div>
+
+    <div class="row filme" ng-repeat="filme in filmes">
+        <div class="col-sm-2">
+            <img src="{{filme.Poster_s}}" class="img-responsive img-thumbnail"/>
+        </div>
+        <div class="col-sm-10">
+            <div class="row">
+                <div class="col-sm-7">
+                    <h2 class="titulo">
+                   <a href="http://www.imdb.com/title/{{filme.imdbID_s}}/?ref_=fn_al_tt_1">{{filme.Title_s}}</a> ({{filme.Year_s}})</h2>
+                </div>
+                <div class="col-sm-5">
+                    <span class="rating">Imdb: {{filme.imdbRating_f}}</span>
+                    <span class="rating">RT: {{filme.tomatoRating_f}}</span>
+                    <span class="rating">URT: {{filme.tomatoUserRating_f}}</span>
+                    
+                </div>
+            </div>
+            <div class="row">
+               <div class="col-sm-4">
+                    <div class="row">
+                        <div class="col-sm-3">Gênero(s):</div>
+                        <div class="col-sm-9">{{filme.Genre_ss.join(', ')}}</div>
+
+                        <div class="col-sm-3">Diretor(es):</div>
+                        <div class="col-sm-9">{{filme.Director_ss.join(', ')}}</div>
+
+                        <div class="col-sm-3">Atores:</div>
+                        <div class="col-sm-9">{{filme.Actors_ss.join(', ')}}</div>
+
+                        <div class="col-sm-3">Script:</div>
+                        <div class="col-sm-9">{{filme.Writer_ss.join(', ')}}</div>
+
+                        <div class="col-sm-3">Língua(s):</div>
+                        <div class="col-sm-9">{{filme.Language_ss.join(', ')}}</div>
+
+                        <div class="col-sm-3">País(es):</div>
+                        <div class="col-sm-9">{{filme.Country_ss.join(', ')}}</div>
+
+
+                    </div>
+                </div>
+              <div class="col-sm-8">
+                {{filme.Plot_t}}
+                <p class="small"><b>Duração:</b> {{filme.Runtime_s}}</p>
+                <p class="small"><b>{{filme.disk_name_s}}</b> {{filme.disk_path_s}}</p>
+              </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!--table st-table="filmes" class="table table-striped">
+        <thead>
+            <tr>
+                <td>Título</td>
+                <td>Year</td>          
+                <td>Genre</td>          
+                <td>Country</td>  
+                <td>Language</td>  
+                <td>imdbRating</td>
+                <td>tomatoRating</td>
+                <td>tomatoUserRating</td>
+                <td>disco</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="filme in filmes">
+                <td><a href="http://www.imdb.com/title/{{filme.imdbID_s}}/?ref_=fn_al_tt_1">{{filme.Title_s}}</a></td>
+                <td>{{filme.Year_s}}</td>
+                <td>{{filme.Genre_ss.join(', ')}}</td>
+                <td>{{filme.Country_ss.join(', ')}}</td>
+                <td>{{filme.Language_ss.join(', ')}}</td>
+                <td>{{filme.imdbRating_f}}</td>
+                <td>{{filme.tomatoRating_f}}</td>
+                <td>{{filme.tomatoUserRating_f}}</td>
+                <td>{{filme.disk_name_s}}</td>
+
+            
+            </tr>
+        </tbody>
+    </table-->
+</div>

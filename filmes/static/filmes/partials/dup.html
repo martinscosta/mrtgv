@@ -1,0 +1,30 @@
+<div class="content">
+    <h3>Filmes Duplicados</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Filme</th>
+                <th>Nr Copias</th>
+                <th>Disco</th>
+                <th>Local</th>
+                <th>Filme Existe</th>
+                <th>ID</th>
+                <th>imdbID</th>                
+                
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="filme in filmes_duplicados">
+                <td>{{filme.title}}</td>
+                <td>{{filme.qtde}}</td>
+                <td>{{filme.disk_name}}</td>
+                <td>{{filme.disk_path}}</td>
+                <td ng-if="filme.pasta_existe" >{{filme.pasta_existe}}</td>
+                <td ng-if="!filme.pasta_existe" ><a ng-click="delete_solr(filme.id)">{{filme.pasta_existe}}</a></td>   
+                <td>{{filme.id}}<br>{{filme.filelist|json}}</td>
+                <td>{{filme.imdbID}}</td>                   
+                
+            </tr>
+        </tbody>
+    </table>
+</div>

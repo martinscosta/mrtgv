@@ -1,0 +1,103 @@
+'use strict';
+console.log('app.js - iniciado');
+angular.module('flmApp',['ngRoute','smart-table','ui.bootstrap','ngSanitize', 'ui.select']);
+
+angular.module('flmApp').factory('flmService',function($http) {
+    console.log('app.js - factory');
+    
+
+    return {
+        get_facets: function(filtros) {
+            return $http.get("/app/filmes/get_facets");
+        },
+        get_filmes: function(filtros) {
+            var fq=["Type_s:movie"];
+            if (filtros != undefined) {
+                for (var key in filtros) {
+                    console.log('key=' + key + ' filtros[key].length='+ filtros[key].length);
+                    if (key == 'generos') {
+                        for (var i=0; i < filtros[key].length; i++) {
+                            fq.push("Genre_ss:" + filtros[key][i]);
+                            console.log('i='+i +' fq=' + fq);
+                        }
+                    }
+                    else {
+                        fq.push(key + ":" + filtros[key]);
+                    }
+                }
+            }
+      
+            
+            return $http.get("/app/filmes/get_filmes",{
+                params:{
+                    q:'*:*',
+                    rows:10,
+                    //fq:["Type_s:movie","Year_s:20*"],
+                    fq:fq,
+                    wt:'json', 
+                    indent:'true',
+                    sort: 'imdbRating_f desc',
+
+            }});
+        }
+    }
+});
+
+angular.module('flmApp').config(['$routeProvider', '$httpProvider', function($routeProvider, $httpProvider, flmService) {
+    console.log('app.js - config');
+    
+    $httpProvider.defaults.useXDomain = true;
+    $httpProvider.defaults.withCredentials = true;
+    delete $httpProvider.defaults.headers.common["X-Requested-With"];
+    $httpProvider.defaults.headers.common["Accept"] = "application/json";
+    $httpProvider.defaults.headers.common["Content-Type"] = "application/json";
+    
+    $routeProvider
+        .when('/', {
+            templateUrl: '/static/filmes/partials/main.html',
+            controller: 'flmCtrl'
+            ,
+            resolve: {
+                filmes: function(flmService) {
+
+                    return flmService.get_filmes();
+                },
+                facets: function(flmService) {
+                    return flmService.get_facets();
+                }
+            }
+        }
+        )
+        .otherwise({redirectTo: '/'});    
+}]);
+
+
+angular.module('flmApp').controller('flmCtrl', function($scope, flmService,filmes,facets) {
+    $scope.filmes = filmes.data.response.docs;
+    
+    $scope.availableGenres = facets.data.Genre_ss;
+    $scope.availableLanguages = facets.data.Language_ss;
+    $scope.availableCountries = facets.data.Country_ss;
+
+    $scope.filtros = {
+        generos : []
+    }
+
+    $scope.filtrosIsCollapsed = true;
+
+    $scope.pesquisar = function() {
+        $scope.filmes = [];
+        flmService.get_filmes($scope.filtros)
+        .success(function(data) {
+            $scope.filmes = data.response.docs;
+        })
+        .error(function(erro) {
+            alert("Erro na Pesquisa");
+            console.log(erro);
+        });
+    }
+
+
+
+});
+
